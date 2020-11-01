@@ -22,10 +22,26 @@ module Danger
     # @return [String]
     attr_accessor :base_path
 
+    # Custom gradle task to run.
+    # This is useful when your project has different flavors.
+    # @return [String]
+    attr_accessor :gradle_task
+
+    def gradlew_exists?
+      `ls gradlew`.strip.empty? == false
+    end
+
     # Report checkstyle warnings
     #
     # @return   [void]
     def report(file, inline_mode = true)
+
+      unless gradlew_exists?
+        raise "Could not find `gradlew` inside current directory"
+      end
+
+      system "./gradlew #{gradle_task}"
+
       raise "Please specify file name." if file.empty?
       raise "No checkstyle file was found at #{file}" unless File.exist? file
       errors = parse(File.read(file))
@@ -68,7 +84,7 @@ module Danger
         file = inline_mode && !issue.file_name.nil? && issue.file_name ? issue.file_name : nil
         line = inline_mode && !issue.line.nil? && issue.line > 0 ? issue.line : nil
 
-        if issue.severity == "error"
+        if issue.severity == "error" or gradle_task.include? 'detekt' or gradle_task.include? 'ktlint'
           fail(issue.message, file: file, line: line)
         elsif issue.severity == "warning"
           warn(issue.message, file: file, line: line)
