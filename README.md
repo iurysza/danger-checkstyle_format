@@ -1,6 +1,6 @@
 # danger-checkstyle_format
 
-Danger plugin that parses a checkstyle format xml file into a PR reports.
+Danger plugin that parses a checkstyle format xml file turns it into a Pull Request static analysis report.
 
 ## Installation
 ``` bashrc
@@ -10,10 +10,9 @@ $ gem "danger-checkstyle_format", github: "iurysza/danger-checkstyle_format"
 
 Parse the XML file, and let the plugin do the reporting.
 - `gradle_task`: You can provide a custom `gradle` task to run before the report. This task can be used to create the checkstyle format file.
-- `severity_level`: You can _force_ the plugin to use a severity level for all issues on the report.
-ie.: `"warning" | "error"`
+- `severity_level`: You can _force_ the plugin to use a severity level for all issues on the report. That can either be: `"warning" | "error"`
 - `report(file, inline_mode = true)`: The file path of the checkstyle format file and weather to report issues with inline comments or not.
-- `base_path`: Base path of `name` attribute in the checkstyle `file` tag.
+- `base_path`: Base path of `name` attribute in the checkstyle `file` tag, usually that's the working directory. (`Dir.pwd` in ruby)
 Eg.:
 
 ``` xml
@@ -22,10 +21,15 @@ Eg.:
       ...
 </checkstyle>
 ```
-An example of this using plugin to apply Kotlin's `detekt` with via a gradle task.
+An example of the usage of this plugin to apply Kotlin's static analysis tools: [detekt](https://github.com/detekt/detekt) and ([ktlint](https://ktlint.github.io/):
 ``` ruby
 checkstyle_format.base_path = Dir.pwd
 checkstyle_format.gradle_task = "detektCi"
+checkstyle_format.report 'build/reports/detekt/checkstyle.xml'
+
+checkstyle_format.base_path = Dir.pwd
+checkstyle_format.gradle_task = "ktlintCi"
+# here we're forcing ktlint issues to be reported as errors.
 checkstyle_format.severity_level = "error"
 checkstyle_format.report 'build/reports/ktlint/checkstyle.xml'
 ```
