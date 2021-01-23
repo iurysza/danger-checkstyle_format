@@ -92,9 +92,10 @@ module Danger
         file = inline_mode && !issue.file_name.nil? && issue.file_name ? issue.file_name : nil
         line = inline_mode && !issue.line.nil? && issue.line > 0 ? issue.line : nil
 
-        if issue.severity == "error" or severity_level.include? "error"
+        severity = severity_level == nil ?  issue.severity ?: severity_level
+        if severity == "error"
           fail(issue.message, file: file, line: line)
-        elsif issue.severity == "warning" or severity_level.include? "warning"
+        elsif severity == "warning"
           warn(issue.message, file: file, line: line)
         else
           message(issue.message, file: file, line: line)
