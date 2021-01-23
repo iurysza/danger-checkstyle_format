@@ -3,10 +3,13 @@ require_relative "checkstyle_error"
 module Danger
   # Danger plugin for checkstyle formatted xml file.
   #
-  # @example Parse the XML file, and let the plugin do your reporting
-  #
+  # @example Using gradle to run a detekt task that spits a report file.
+  # Then, parse the XML file while forcing all issues to have error status.
+  # 
   #          checkstyle_format.base_path = Dir.pwd
-  #          checkstyle_format.report 'app/build/reports/checkstyle/checkstyle.xml'
+  #          checkstyle_format.gradle_task = "detektCi"
+  #          checkstyle_format.severity_level = "error"
+  #          checkstyle_format.report 'build/reports/detekt/checkstyle.xml'
   #
   # @example Parse the XML text, and let the plugin do your reporting
   #
@@ -18,11 +21,11 @@ module Danger
   #
   class DangerCheckstyleFormat < Plugin
     # Base path of `name` attributes in `file` tag.
-    # Defaults to nil.
+    # Defaults to Dir.pwd.
     # @return [String]
     attr_accessor :base_path
 
-    # Custom gradle task to run.
+    # Optional gradle task to run.
     # This is the name of the gradle task that will create 
     # the check style xml file that this plugin will read
     # @return [String]
@@ -31,6 +34,10 @@ module Danger
     # Forces this severity level for all issues
     # "none" | "warning" | "error"
     attr_accessor :severity_level
+    
+    def initialize
+      @base_path = 'Dir.pwd'    
+    end
     
     def gradlew_exists?
       `ls gradlew`.strip.empty? == false
@@ -89,7 +96,6 @@ module Danger
         file = inline_mode && !issue.file_name.nil? && issue.file_name ? issue.file_name : nil
         line = inline_mode && !issue.line.nil? && issue.line > 0 ? issue.line : nil
 
-        # Will report error if the task used to create the output file has "detekt" or "ktlint" in its name
         if issue.severity == "error" or severity_level.include? "error"
           fail(issue.message, file: file, line: line)
         elsif issue.severity == "warning" or severity_level.include? "warning"
