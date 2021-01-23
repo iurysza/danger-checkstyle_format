@@ -3,10 +3,13 @@ require_relative "checkstyle_error"
 module Danger
   # Danger plugin for checkstyle formatted xml file.
   #
-  # @example Parse the XML file, and let the plugin do your reporting
-  #
+  # @example Using gradle to run a detekt task that spits a report file.
+  # Then, parse the XML file while forcing all issues to have error status.
+  # 
   #          checkstyle_format.base_path = Dir.pwd
-  #          checkstyle_format.report 'app/build/reports/checkstyle/checkstyle.xml'
+  #          checkstyle_format.gradle_task = "detektCi"
+  #          checkstyle_format.severity_level = "error"
+  #          checkstyle_format.report 'build/reports/detekt/checkstyle.xml'
   #
   # @example Parse the XML text, and let the plugin do your reporting
   #
@@ -18,15 +21,20 @@ module Danger
   #
   class DangerCheckstyleFormat < Plugin
     # Base path of `name` attributes in `file` tag.
-    # Defaults to nil.
+    # Defaults to Dir.pwd.
     # @return [String]
     attr_accessor :base_path
 
-    # Custom gradle task to run.
-    # This is useful when your project has different flavors.
+    # Optional gradle task to run.
+    # This is the name of the gradle task that will create 
+    # the check style xml file that this plugin will read
     # @return [String]
     attr_accessor :gradle_task
 
+    # Forces this severity level for all issues
+    # "none" | "warning" | "error"
+    attr_accessor :severity_level
+    
     def gradlew_exists?
       `ls gradlew`.strip.empty? == false
     end
@@ -35,7 +43,7 @@ module Danger
     #
     # @return   [void]
     def report(file, inline_mode = true)
-
+      
       unless gradlew_exists?
         raise "Could not find `gradlew` inside current directory"
       end
@@ -84,9 +92,10 @@ module Danger
         file = inline_mode && !issue.file_name.nil? && issue.file_name ? issue.file_name : nil
         line = inline_mode && !issue.line.nil? && issue.line > 0 ? issue.line : nil
 
-        if issue.severity == "error" or gradle_task.include? 'detekt' or gradle_task.include? 'ktlint'
+        severity = severity_level == nil ?  issue.severity : severity_level
+        if severity == "error"
           fail(issue.message, file: file, line: line)
-        elsif issue.severity == "warning"
+        elsif severity == "warning"
           warn(issue.message, file: file, line: line)
         else
           message(issue.message, file: file, line: line)
