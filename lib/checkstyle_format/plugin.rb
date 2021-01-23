@@ -35,10 +35,6 @@ module Danger
     # "none" | "warning" | "error"
     attr_accessor :severity_level
     
-    def initialize(base_path='Dir.pwd', gradle_task='', severity_level='')
-      @base_path = base_path
-    end
-    
     def gradlew_exists?
       `ls gradlew`.strip.empty? == false
     end
@@ -47,7 +43,7 @@ module Danger
     #
     # @return   [void]
     def report(file, inline_mode = true)
-
+      
       unless gradlew_exists?
         raise "Could not find `gradlew` inside current directory"
       end
