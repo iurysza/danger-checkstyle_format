@@ -23,10 +23,15 @@ module Danger
     attr_accessor :base_path
 
     # Custom gradle task to run.
-    # This is useful when your project has different flavors.
+    # This is the name of the gradle task that will create 
+    # the check style xml file that this plugin will read
     # @return [String]
     attr_accessor :gradle_task
 
+    # Forces this severity level for all issues
+    # "none" | "warning" | "error"
+    attr_accessor :severity_level
+    
     def gradlew_exists?
       `ls gradlew`.strip.empty? == false
     end
@@ -84,9 +89,10 @@ module Danger
         file = inline_mode && !issue.file_name.nil? && issue.file_name ? issue.file_name : nil
         line = inline_mode && !issue.line.nil? && issue.line > 0 ? issue.line : nil
 
-        if issue.severity == "error" or gradle_task.include? 'detekt' or gradle_task.include? 'ktlint'
+        # Will report error if the task used to create the output file has "detekt" or "ktlint" in its name
+        if issue.severity == "error" or severity_level.include? "error"
           fail(issue.message, file: file, line: line)
-        elsif issue.severity == "warning"
+        elsif issue.severity == "warning" or severity_level.include? "warning"
           warn(issue.message, file: file, line: line)
         else
           message(issue.message, file: file, line: line)
