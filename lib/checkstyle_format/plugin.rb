@@ -35,7 +35,7 @@ module Danger
     # "none" | "warning" | "error"
     attr_accessor :severity_level
     
-    def initialize(base_path='Dir.pwd', gradle_task, severity_level)
+    def initialize(base_path='Dir.pwd', gradle_task='', severity_level='')
       @base_path = base_path
     end
     
