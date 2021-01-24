@@ -35,10 +35,10 @@ With the `gradle_task` property you can provide a custom `gradle` task to run be
 With the `severity_level` property you can _force_ the plugin to use a severity level for all issues on the report. 
 That can either be: `"none" | "warning" | "error"`
 ## Inline comments
-When calling the report `report` method you can specify the file path of the checkstyle format file and weather to report issues with inline comments or not.
+When calling the report `report` method you can specify the path of the checkstyle format file and whether to report issues with inline comments or not.
 
 # Example
-An example of the usage of this plugin to apply Kotlin's static analysis tools: [detekt](https://github.com/detekt/detekt) and [ktlint](https://ktlint.github.io/):
+You can add this to your `Dangerfile` to use this plugin to apply Kotlin's static analysis tools: [detekt](https://github.com/detekt/detekt) and [ktlint](https://ktlint.github.io/):
 ``` ruby
 
 # Base path of `name` attribute in the checkstyle `file` tag, usually that's the working directory. (`Dir.pwd` in ruby)
