@@ -26,7 +26,7 @@ This is a typical checkstyle format file:
 </checkstyle>
 ```
 
-This plugin will parse that file and create comments on directly on pull requests using Danger's api.
+This plugin will parse that file and create comments directly on your pull requests using Danger's api.
 It also offers some basic configurations like:
 
 ## Run a gradle task
