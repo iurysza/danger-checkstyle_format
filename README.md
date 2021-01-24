@@ -11,7 +11,9 @@ $ gem "danger-checkstyle_format", github: "iurysza/danger-checkstyle_format"
 Many static analysis tools can create this type of file as an output.
 This is a typical checkstyle format file:
 ``` xml  
-<file
+<?xml version="1.0" encoding="utf-8"?>
+<checkstyle version="4.3">
+    <file
         name="/Users/john-doe/project/src/main/kotlin/com/john/doe/storage/ExternalStorageService.kt">
         <error
             column="18"
@@ -20,6 +22,8 @@ This is a typical checkstyle format file:
             severity="error" 
             source="detekt.TooGenericExceptionCaught"
         />
+    </file>
+</checkstyle>
 ```
 
 This plugin will parse that file and create comments on directly on pull requests using Danger's api.
